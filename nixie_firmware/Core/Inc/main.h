@@ -86,6 +86,8 @@ void Error_Handler(void);
 #define SIGN_3_GPIO_Port GPIOA
 #define SIGN_2_Pin GPIO_PIN_12
 #define SIGN_2_GPIO_Port GPIOA
+#define SIGN_1_Pin GPIO_PIN_13
+#define SIGN_1_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

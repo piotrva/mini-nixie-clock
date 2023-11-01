@@ -412,7 +412,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, SIGN_6_Pin|SIGN_5_Pin|SIGN_4_Pin|SIGN_3_Pin
-                          |SIGN_2_Pin, GPIO_PIN_RESET);
+                          |SIGN_2_Pin|SIGN_1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : IR_REC_Pin */
   GPIO_InitStruct.Pin = IR_REC_Pin;
@@ -435,9 +435,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : SIGN_6_Pin SIGN_5_Pin SIGN_4_Pin SIGN_3_Pin
-                           SIGN_2_Pin */
+                           SIGN_2_Pin SIGN_1_Pin */
   GPIO_InitStruct.Pin = SIGN_6_Pin|SIGN_5_Pin|SIGN_4_Pin|SIGN_3_Pin
-                          |SIGN_2_Pin;
+                          |SIGN_2_Pin|SIGN_1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -598,7 +598,7 @@ void setSign(uint8_t sign, dot_t dot)
       HAL_GPIO_WritePin(SIGN_0_GPIO_Port, SIGN_0_Pin, GPIO_PIN_SET);
       break;
     case 1:
-      //HAL_GPIO_WritePin(SIGN_1_GPIO_Port, SIGN_1_Pin, GPIO_PIN_SET); /* TODO: SIGN_1 line colides with SWD interface */
+      HAL_GPIO_WritePin(SIGN_1_GPIO_Port, SIGN_1_Pin, GPIO_PIN_SET);
       break;
     case 2:
       HAL_GPIO_WritePin(SIGN_2_GPIO_Port, SIGN_2_Pin, GPIO_PIN_SET);
@@ -629,7 +629,7 @@ void setSign(uint8_t sign, dot_t dot)
     case SIGN_BLANK:
     default:
       HAL_GPIO_WritePin(SIGN_0_GPIO_Port, SIGN_0_Pin, GPIO_PIN_RESET);
-      //HAL_GPIO_WritePin(SIGN_1_GPIO_Port, SIGN_1_Pin, GPIO_PIN_RESET); /* TODO: SIGN_1 line colides with SWD interface */
+      HAL_GPIO_WritePin(SIGN_1_GPIO_Port, SIGN_1_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(SIGN_2_GPIO_Port, SIGN_2_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(SIGN_3_GPIO_Port, SIGN_3_Pin, GPIO_PIN_RESET);
       HAL_GPIO_WritePin(SIGN_4_GPIO_Port, SIGN_4_Pin, GPIO_PIN_RESET);
