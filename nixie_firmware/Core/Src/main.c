@@ -43,6 +43,7 @@
 RTC_HandleTypeDef hrtc;
 
 /* USER CODE BEGIN PV */
+RTC_TimeTypeDef time;
 
 /* USER CODE END PV */
 
@@ -96,6 +97,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BCD);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
