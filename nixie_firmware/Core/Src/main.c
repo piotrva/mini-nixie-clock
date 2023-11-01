@@ -249,7 +249,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : IR_REC_Pin */
   GPIO_InitStruct.Pin = IR_REC_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FALLING;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(IR_REC_GPIO_Port, &GPIO_InitStruct);
 
@@ -262,22 +262,97 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+#define PULSE_US_START  13500
+#define PULSE_US_REPEAT 11250
+#define PULSE_US_0       1120
+#define PULSE_US_1       2250
+#define PULSE_US_TOL      500
+
+typedef enum {
+  NEC_START,
+  NEC_REPEAT,
+  NEC_0,
+  NEC_1,
+  NEC_ERROR,  
+} necPulse_t;
+
+necPulse_t necPulseDecode(uint16_t pulse_us)
+{
+  if (pulse_us > PULSE_US_0 - PULSE_US_TOL && pulse_us < PULSE_US_0 + PULSE_US_TOL)
+  {
+    return NEC_0;
+  }
+  else if (pulse_us > PULSE_US_1 - PULSE_US_TOL && pulse_us < PULSE_US_1 + PULSE_US_TOL)
+  {
+    return NEC_1;
+  }
+  else if (pulse_us > PULSE_US_REPEAT - PULSE_US_TOL && pulse_us < PULSE_US_REPEAT + PULSE_US_TOL)
+  {
+    return NEC_REPEAT;
+  }
+  else if (pulse_us > PULSE_US_START - PULSE_US_TOL && pulse_us < PULSE_US_START + PULSE_US_TOL)
+  {
+    return NEC_START;
+  }
+  else 
+  {
+    return NEC_ERROR;
+  }
+}
+
+#define NEC_BITS 32
+
+void necCallback(uint8_t address, uint8_t command)
+{
+  address = command;
+}
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   static uint16_t last = 0;
-  static uint16_t pulse[32];
+  static uint32_t data;
   static uint8_t counter = 0;
+  necPulse_t pulse;
   if (GPIO_Pin == IR_REC_Pin)
   {
-    if (counter < 32)
+    pulse = necPulseDecode(__HAL_TIM_GET_COUNTER(&htim1) - last);
+    last = __HAL_TIM_GET_COUNTER(&htim1);
+    if (counter == 0)
     {
-      pulse[counter] = __HAL_TIM_GET_COUNTER(&htim1) - last;
-      last = __HAL_TIM_GET_COUNTER(&htim1);
-      counter++;
+      if (pulse == NEC_START)
+      {
+        data = 0;
+        counter = NEC_BITS;
+      }
+      else if (pulse == NEC_REPEAT)
+      {
+        /* repeat not supported now */
+      }
     }
     else
     {
-      counter = 0;
+      if (pulse == NEC_ERROR || pulse == NEC_REPEAT)
+      {
+        /* error - exit decoding immedetely (also we do not except REPEAT here...) */
+        counter = 0;
+        return;
+      }
+      data >>=1;
+      data |= (pulse==NEC_1)?(1UL<<31):0;
+      counter--;
+      if (counter == 0)
+      {
+        /* all bits shall be collected by now - verify negated parts */
+        uint8_t address, address_neg, command, command_neg;
+        command = ~(data>>24);
+        command_neg = data>>16;
+        address = ~(data>>8);
+        address_neg = data;
+        if (command == command_neg && address == address_neg)
+        {
+          necCallback(address, command);
+        }
+      }
     }
   }
 }
