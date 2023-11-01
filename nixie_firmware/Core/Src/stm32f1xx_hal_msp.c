@@ -72,7 +72,7 @@ void HAL_MspInit(void)
   /* System interrupt init*/
 
   /* USER CODE BEGIN MspInit 1 */
-  __HAL_AFIO_REMAP_SWJ_DISABLE();
+  // __HAL_AFIO_REMAP_SWJ_DISABLE(); /* this completely disables SWD, so these pads (including PA13) can be used as GPIO */
   /* USER CODE END MspInit 1 */
 }
 
