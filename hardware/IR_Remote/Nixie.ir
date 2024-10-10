@@ -1,0 +1,39 @@
+Filetype: IR signals file
+Version: 1
+# 
+name: H+
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 8D 00 00 00
+# 
+name: H-
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 8E 00 00 00
+# 
+name: M+
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 90 00 00 00
+# 
+name: M-
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 8F 00 00 00
+# 
+name: Menu
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 95 00 00 00
+# 
+name: Exit
+type: parsed
+protocol: NEC
+address: 77 00 00 00
+command: 96 00 00 00
+
