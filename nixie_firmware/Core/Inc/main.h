@@ -57,37 +57,15 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define IR_REC_Pin GPIO_PIN_3
-#define IR_REC_GPIO_Port GPIOA
-#define IR_REC_EXTI_IRQn EXTI3_IRQn
-#define DIGIT_1_Pin GPIO_PIN_12
-#define DIGIT_1_GPIO_Port GPIOB
-#define DIGIT_2_Pin GPIO_PIN_13
-#define DIGIT_2_GPIO_Port GPIOB
-#define DIGIT_3_Pin GPIO_PIN_14
-#define DIGIT_3_GPIO_Port GPIOB
-#define DIGIT_4_Pin GPIO_PIN_15
-#define DIGIT_4_GPIO_Port GPIOB
-#define SIGN_0_Pin GPIO_PIN_6
-#define SIGN_0_GPIO_Port GPIOC
-#define SIGN_9_Pin GPIO_PIN_7
-#define SIGN_9_GPIO_Port GPIOC
-#define SIGN_8_Pin GPIO_PIN_8
-#define SIGN_8_GPIO_Port GPIOC
-#define SIGN_7_Pin GPIO_PIN_9
-#define SIGN_7_GPIO_Port GPIOC
-#define SIGN_6_Pin GPIO_PIN_8
-#define SIGN_6_GPIO_Port GPIOA
-#define SIGN_5_Pin GPIO_PIN_9
-#define SIGN_5_GPIO_Port GPIOA
-#define SIGN_4_Pin GPIO_PIN_10
-#define SIGN_4_GPIO_Port GPIOA
-#define SIGN_3_Pin GPIO_PIN_11
-#define SIGN_3_GPIO_Port GPIOA
-#define SIGN_2_Pin GPIO_PIN_12
-#define SIGN_2_GPIO_Port GPIOA
-#define SIGN_1_Pin GPIO_PIN_13
-#define SIGN_1_GPIO_Port GPIOA
+#define SPI_OE_Pin GPIO_PIN_1
+#define SPI_OE_GPIO_Port GPIOA
+#define PhotoResistor_Pin GPIO_PIN_4
+#define PhotoResistor_GPIO_Port GPIOA
+#define SPI_LATCH_Pin GPIO_PIN_4
+#define SPI_LATCH_GPIO_Port GPIOC
+#define IR_REC_Pin GPIO_PIN_0
+#define IR_REC_GPIO_Port GPIOB
+#define IR_REC_EXTI_IRQn EXTI0_IRQn
 
 /* USER CODE BEGIN Private defines */
 
