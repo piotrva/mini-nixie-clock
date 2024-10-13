@@ -460,9 +460,9 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 23;
+  htim2.Init.Prescaler = 239;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 999;
+  htim2.Init.Period = 9999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -536,10 +536,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI_OE_GPIO_Port, SPI_OE_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SPI_OE_GPIO_Port, SPI_OE_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(SPI_LATCH_GPIO_Port, SPI_LATCH_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(SPI_LATCH_GPIO_Port, SPI_LATCH_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : SPI_OE_Pin */
   GPIO_InitStruct.Pin = SPI_OE_Pin;
@@ -694,11 +694,60 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   }
 }
 
-typedef enum {
-  NO_DOT,
-  DOT_0,
-  DOT_1
-} dot_t;
+#define U7 0
+#define U6 1
+#define U5 2
+#define U4 3
+
+#define QA 0
+#define QB 1
+#define QC 2
+#define QD 3
+#define QE 4
+#define QF 5
+#define QG 6
+#define QH 7
+
+#define DG0 0
+#define DG1 (1UL<<((8 * U4) + QA))
+#define DG2 (1UL<<((8 * U4) + QB))
+
+#define JG1 (1UL<<((8 * U4) + QC))
+#define JG2 (1UL<<((8 * U4) + QD))
+#define JG3 (1UL<<((8 * U4) + QE))
+#define JG4 (1UL<<((8 * U4) + QF))
+#define JG5 (1UL<<((8 * U4) + QG))
+#define JG6 (1UL<<((8 * U4) + QH))
+#define JG7 (1UL<<((8 * U5) + QA))
+#define JG8 (1UL<<((8 * U5) + QB))
+#define JG9 (1UL<<((8 * U5) + QC))
+#define JG0 (1UL<<((8 * U5) + QD))
+
+#define DOT (1UL<<((8 * U5) + QE))
+
+#define DM1 (1UL<<((8 * U5) + QF))
+#define DM2 (1UL<<((8 * U5) + QG))
+#define DM3 (1UL<<((8 * U5) + QH))
+#define DM4 (1UL<<((8 * U6) + QA))
+#define DM5 (1UL<<((8 * U6) + QB))
+#define DM0 (1UL<<((8 * U6) + QC))
+
+#define JM1 (1UL<<((8 * U6) + QD))
+#define JM2 (1UL<<((8 * U6) + QE))
+#define JM3 (1UL<<((8 * U6) + QF))
+#define JM4 (1UL<<((8 * U6) + QG))
+#define JM5 (1UL<<((8 * U6) + QH))
+#define JM6 (1UL<<((8 * U7) + QA))
+#define JM7 (1UL<<((8 * U7) + QB))
+#define JM8 (1UL<<((8 * U7) + QC))
+#define JM9 (1UL<<((8 * U7) + QD))
+#define JM0 (1UL<<((8 * U7) + QE))
+
+const uint32_t DG_LUT[] = {DG0, DG1, DG2};
+const uint32_t JG_LUT[] = {JG0, JG1, JG2, JG3, JG4, JG5, JG6, JG7, JG8, JG9};
+const uint32_t DM_LUT[] = {DM0, DM1, DM2, DM3, DM4, DM5};
+const uint32_t JM_LUT[] = {JM0, JM1, JM2, JM3, JM4, JM5, JM6, JM7, JM8, JM9};
+
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -706,6 +755,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
     /* Here transfer sign configuration over SPI */
     //setSign(signs[digit], (digit==0)?(signDot?DOT_1:DOT_0):NO_DOT);
+    uint32_t dataSPI = 0x00000000;
+
+    dataSPI |= DG_LUT[signs[0]];
+    dataSPI |= JG_LUT[signs[1]];
+    dataSPI |= DM_LUT[signs[2]];
+    dataSPI |= JM_LUT[signs[3]];
+    dataSPI |= signDot?DOT:0UL;
+
+    HAL_GPIO_WritePin(SPI_LATCH_GPIO_Port, SPI_LATCH_Pin, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(&hspi1, (uint8_t*)&dataSPI, 4, 10000UL);
+    HAL_GPIO_WritePin(SPI_LATCH_GPIO_Port, SPI_LATCH_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(SPI_OE_GPIO_Port, SPI_OE_Pin, GPIO_PIN_RESET);
   }
 }
 /* USER CODE END 4 */
