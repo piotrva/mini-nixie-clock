@@ -40,7 +40,7 @@ typedef enum {
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define BLINK_IDLE 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -147,7 +147,18 @@ int main(void)
       {
         lastTickDot = HAL_GetTick();
         __disable_irq();
-        signDot = !signDot;
+        #if BLINK_IDLE == 1
+          signDot = !signDot;
+        #else
+          if (inMenu)
+          {
+            signDot = !signDot;
+          }
+          else
+          {
+            signDot = true;
+          }
+        #endif
         __enable_irq();
       }
 
@@ -754,7 +765,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim == &htim2)
   {
     /* Here transfer sign configuration over SPI */
-    //setSign(signs[digit], (digit==0)?(signDot?DOT_1:DOT_0):NO_DOT);
     uint32_t dataSPI = 0x00000000;
 
     dataSPI |= DG_LUT[signs[0]];
