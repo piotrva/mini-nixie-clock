@@ -51,9 +51,9 @@ void CLI_StringToUpper(char *dst, const char *src){
 int32_t getNumber(char* str, int32_t* idx){
 	int32_t number = atoi(str+(*idx));
 
-	while(*(str+(*idx)) != ';' && *(str+(*idx)) != '\0') (*idx)++;
+	while(*(str+(*idx)) != ' ' && *(str+(*idx)) != '\0') (*idx)++;
 
-	if(*(str+(*idx)) == ';') (*idx)++;
+	if(*(str+(*idx)) == ' ') (*idx)++;
 
 	return number;
 }

@@ -21,6 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+
 #include "serial.h"
 #include "cli.h"
 /* USER CODE END Includes */
@@ -66,6 +68,7 @@ RTC_TimeTypeDef time;
 volatile uint8_t signs[4] = {1, 2, 3, 4};
 volatile bool signDot = true;
 volatile remoteAction_t remoteAction = REMOTE_IDLE;
+volatile uint8_t timeSyncBlinkCount = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,13 +86,31 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void commandPASS(char *args)
+void commandGT(char *args)
 {
-  UART_WriteString(&huart2, "  Password could not be changed correctly!\r\n");
+  char timeString[16];
+  sprintf(timeString, "%02d %02d %02d\r\n", time.Hours, time.Minutes, time.Seconds);
+  UART_WriteString(&huart2, timeString);
 }
-CLI_CommandItem item_PASS = { .callback = commandPASS,
-                              .commandName = "PASS",
-                              .description = "new     * Set new password"};
+CLI_CommandItem item_GT = { .callback = commandGT,
+                            .commandName = "GT",
+                            .description = "Get time in format HH MM SS"};
+
+void commandST(char *args)
+{
+  // char timeString[16];
+  int32_t idx = 0;
+  time.Hours   = getNumber(args, &idx);
+  time.Minutes = getNumber(args, &idx);
+  time.Seconds = getNumber(args, &idx);
+  // sprintf(timeString, "%02d %02d %02d\r\n", time.Hours, time.Minutes, time.Seconds);
+  // UART_WriteString(&huart2, timeString);
+  HAL_RTC_SetTime(&hrtc, &time, RTC_FORMAT_BIN);
+  timeSyncBlinkCount = 20;
+}
+CLI_CommandItem item_ST = { .callback = commandST,
+                            .commandName = "ST",
+                            .description = "Set time in format HH MM SS"};
 
 void commandHELP(char *args)
 {
@@ -97,7 +118,7 @@ void commandHELP(char *args)
 }
 CLI_CommandItem item_HELP = {   .callback = commandHELP,
                 .commandName = "?",
-                .description = "             Display this help"};
+                .description = "Display this help"};
 /* USER CODE END 0 */
 
 /**
@@ -141,7 +162,8 @@ int main(void)
   HAL_TIM_Base_Start(&htim1);
   HAL_TIM_Base_Start_IT(&htim2);
 
-  CLI_AddCommand(&item_PASS);
+  CLI_AddCommand(&item_ST);
+  CLI_AddCommand(&item_GT);
   CLI_AddCommand(&item_HELP);
   UART_Init(&huart2);
   /* USER CODE END 2 */
@@ -163,14 +185,18 @@ int main(void)
       }
 
       /* toggle dot every 500ms (100ms when in menu) */
-      if (HAL_GetTick() - lastTickDot > (inMenu?100:500))
+      if (HAL_GetTick() - lastTickDot > ((inMenu || timeSyncBlinkCount > 0)?100:500))
       {
         lastTickDot = HAL_GetTick();
         __disable_irq();
+        if (timeSyncBlinkCount > 0)
+        {
+          timeSyncBlinkCount--;
+        }
         #if BLINK_IDLE == 1
           signDot = !signDot;
         #else
-          if (inMenu)
+          if (inMenu || timeSyncBlinkCount > 0)
           {
             signDot = !signDot;
           }
