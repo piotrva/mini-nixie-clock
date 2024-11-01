@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "serial.h"
+#include "cli.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,7 +83,21 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void commandPASS(char *args)
+{
+  UART_WriteString(&huart2, "  Password could not be changed correctly!\r\n");
+}
+CLI_CommandItem item_PASS = { .callback = commandPASS,
+                              .commandName = "PASS",
+                              .description = "new     * Set new password"};
 
+void commandHELP(char *args)
+{
+  CLI_PrintAllCommands();
+}
+CLI_CommandItem item_HELP = {   .callback = commandHELP,
+                .commandName = "?",
+                .description = "             Display this help"};
 /* USER CODE END 0 */
 
 /**
@@ -125,12 +140,17 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim1);
   HAL_TIM_Base_Start_IT(&htim2);
+
+  CLI_AddCommand(&item_PASS);
+  CLI_AddCommand(&item_HELP);
+  UART_Init(&huart2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    CLI_Proc();
     /* refresh every 25ms */
     if (HAL_GetTick() - lastTickRefresh > 25)
     {
