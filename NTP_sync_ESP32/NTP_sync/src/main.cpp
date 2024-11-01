@@ -4,6 +4,16 @@
 
 #include "credentials.h"
 
+// Connections:
+// ESP32   <->   Nixie
+// GND           1 GND
+//               2 SWDIO
+//               3 SWCLK
+//               4 NRST
+// 3V3           5 3.3V
+// 20 (RX)       6 TX USART2
+// 21 (TX)       7 RX USART2
+
 // Edit below to change how often to check time synchronization between Nixie and NTP. 15s default
 #define TIME_CHECK_INTERVAL_MS (15UL*1000UL)
 // Edit below to change what time difference shall trigger updating time on nixie clock. 30s default
