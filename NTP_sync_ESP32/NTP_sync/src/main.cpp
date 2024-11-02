@@ -116,10 +116,12 @@ void setup() {
     Serial.print(".");
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
   }
+  digitalWrite(LED_BUILTIN, HIGH);
   Serial.println("");
   Serial.println("WiFi connected.");
 
   initTime("CET-1CEST,M3.5.0,M10.5.0/3");   // Set for Europe/Warsaw
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 unsigned long lastTimeCheck = 0;
@@ -142,10 +144,12 @@ void loop() {
         Serial.println("Update Nixie now!");
         Serial1.printf("ST %02d %02d %02d\r\n", localTime.tm_hour, localTime.tm_min, localTime.tm_sec);
       }
+      digitalWrite(LED_BUILTIN, LOW);
     }
     else
     {
       Serial.println("Failed to obtain NTP or Nixie time...");
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
 }
